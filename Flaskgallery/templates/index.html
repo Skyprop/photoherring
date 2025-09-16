@@ -1,53 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Photography Gallery</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<meta charset="UTF-8">
+<title>Photography Gallery</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="banner">
-      <h1>Photography Gallery</h1>
+
+<!-- Header -->
+<header class="header">
+  <nav class="nav">
+    <a href="{{ url_for('index') }}">Home</a>
+    {% if logged_in %}
+      <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Login</a>
+    {% endif %}
+  </nav>
+  <div class="banner">
+    <h1>Photography Gallery</h1>
+  </div>
+</header>
+
+<!-- Content / Gallery -->
+<main class="content">
+    <div class="categories">
+        <button onclick="filterCategory('All')">All</button>
+        {% for cat in categories %}
+        <button onclick="filterCategory('{{ cat }}')">{{ cat }}</button>
+        {% endfor %}
     </div>
-    <nav class="nav">
-      <a href="{{ url_for('index') }}">Home</a>
-      {% if logged_in %}
-        <a href="{{ url_for('logout') }}">Logout</a>
-      {% else %}
-        <a href="{{ url_for('login') }}">Login</a>
-      {% endif %}
-    </nav>
-  </header>
 
-  <!-- Content / Gallery -->
-  <main class="content">
-    <div class="gallery">
-      {% for img in images %}
-        <div class="gallery-item">
-          <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="{{ img }}">
-          {% if logged_in %}
-            <a href="{{ url_for('delete', filename=img) }}" class="delete-btn">×</a>
-          {% endif %}
-        </div>
-      {% endfor %}
-
-      {% if logged_in %}
-      <!-- Upload tile -->
-      <div class="gallery-item upload">
-        <form method="post" enctype="multipart/form-data">
-          <input type="file" name="file" onchange="this.form.submit()">
-          <span class="plus">+</span>
-        </form>
+  <div class="gallery">
+    {% for img in images %}
+      <div class="gallery-item" 
+           onclick="openModal(this)"
+           data-filename="{{ img.filename }}"
+           data-title="{{ img.title }}"
+           data-category="{{ img.category }}"
+           data-date="{{ img.date }}">
+        <img src="{{ url_for('static', filename='uploads/' ~ img.filename) }}" alt="{{ img.title }}">
+        {% if logged_in %}
+          <a href="{{ url_for('delete', filename=img.filename) }}" class="delete-btn">×</a>
+        {% endif %}
       </div>
-      {% endif %}
-    </div>
-  </main>
+    {% endfor %}
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>&copy; 2025 My Photography Gallery. All rights reserved.</p>
-  </footer>
+    {% if logged_in %}
+    <div class="gallery-item upload">
+      <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" onchange="this.form.submit()">
+        <span class="plus">+</span>
+      </form>
+    </div>
+
+    <div id="editModal" class="modal">
+        <form id="editForm" method="post">
+            <label>Title:</label>
+            <input type="text" name="title" id="modalTitle">
+            <label>Category:</label>
+            <input type="text" name="category" id="modalCategory">
+            <label>Date:</label>
+            <input type="datetime-local" name="date" id="modalDate">
+            <button type="submit">Save</button>
+            <button type="button" onclick="closeModal()">Cancel</button>
+        </form>
+    </div>
+    {% endif %}
+  </div>
+</main>
+
+<!-- Edit Modal -->
+
+
+<!-- Footer -->
+<footer class="footer">
+  <p>&copy; 2025 My Photography Gallery</p>
+</footer>
+
+<script>
+function openModal(img) {
+  document.getElementById('modalTitle').value = img.dataset.title;
+  document.getElementById('modalCategory').value = img.dataset.category;
+  document.getElementById('modalDate').value = img.dataset.date.slice(0,16);
+  document.getElementById('editForm').action = "/edit/" + img.dataset.filename;
+  document.getElementById('editModal').style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById('editModal').style.display = "none";
+}
+
+function filterCategory(cat) {
+  let items = document.querySelectorAll('.gallery-item');
+  items.forEach(item => {
+    if(item.classList.contains('upload')) {
+      item.style.display = 'flex'; // always show upload
+    } else if(cat === 'All' || item.dataset.category === cat){
+      item.style.display = 'block';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+</script>
+
 </body>
 </html>
