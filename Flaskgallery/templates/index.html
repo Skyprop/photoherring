@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Photography Gallery</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="banner">
+      <h1>Photography Gallery</h1>
+    </div>
+    <nav class="nav">
+      <a href="{{ url_for('index') }}">Home</a>
+      {% if logged_in %}
+        <a href="{{ url_for('logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Login</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <!-- Content / Gallery -->
+  <main class="content">
+    <div class="gallery">
+      {% for img in images %}
+        <div class="gallery-item">
+          <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="{{ img }}">
+          {% if logged_in %}
+            <a href="{{ url_for('delete', filename=img) }}" class="delete-btn">×</a>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      {% if logged_in %}
+      <!-- Upload tile -->
+      <div class="gallery-item upload">
+        <form method="post" enctype="multipart/form-data">
+          <input type="file" name="file" onchange="this.form.submit()">
+          <span class="plus">+</span>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 My Photography Gallery. All rights reserved.</p>
+  </footer>
+</body>
+</html>
