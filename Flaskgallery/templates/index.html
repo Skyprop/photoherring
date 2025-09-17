@@ -17,20 +17,33 @@
       <a href="{{ url_for('login') }}">Login</a>
     {% endif %}
   </nav>
-  <div class="banner">
-    <h1>Photography Gallery</h1>
-  </div>
 </header>
 
-<!-- Content / Gallery -->
-<main class="content">
+<div class="banner" 
+     style="background-image: url('{{ url_for('static', filename='banner.jpg') }}');">
+
+  <h1>Photography Gallery</h1>
+
+  {% if logged_in %}
+    <!-- Cogwheel upload button -->
+    <form method="post" action="{{ url_for('set_banner') }}" enctype="multipart/form-data" id="bannerForm">
+      <input type="file" name="banner" id="bannerInput" style="display:none" onchange="this.form.submit()">
+      <span class="banner-cog" onclick="document.getElementById('bannerInput').click()">⚙️</span>
+    </form>
+  {% endif %}
+
   <div class="categories">
     <button onclick="filterCategory('All')">All</button>
     {% for cat in categories %}
       <button onclick="filterCategory('{{ cat }}')">{{ cat }}</button>
     {% endfor %}
   </div>
+</div>
 
+
+
+<!-- Content / Gallery -->
+<main class="content">
   <div class="gallery">
     {% for img in images %}
       <div class="gallery-item" 
@@ -154,6 +167,25 @@ function filterCategory(cat) {
     }
   });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll(".categories button");
+
+  // Activate "All" button by default on load
+  const allBtn = Array.from(buttons).find(b => b.textContent.trim() === "All");
+  if (allBtn) {
+    allBtn.classList.add("active");
+    filterCategory("All"); // also show all images
+  }
+
+  // Add click behavior
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
+});
 
 
 

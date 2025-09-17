@@ -3,18 +3,39 @@
 body { font-family: Arial, sans-serif; background:#f5f5f5; color:#333; min-height:100vh; display:flex; flex-direction:column; }
 
 .header { position:fixed; top:0; left:0; width:100%; z-index:100; }
-.banner { text-align:center; padding:20px; background:#444; color:#fff; }
+.banner { background-image: url("https://wallpapers.com/images/hd/leafy-linkedin-banner-gh1iczkc08m3mgcx.jpg"); background-repeat: no-repeat; background-size:cover; position:relative; text-align:center; height:20vw; min-height:200px; padding-top:50px; color:#fff; align-content: center;}
 .banner h1 { font-size:2rem; }
+.banner-cog {
+  position: absolute;
+  top: 50px;
+  right: 30px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #fff;
+  background: rgba(0,0,0,0.4);
+  padding: 8px 8px;
+  border-radius: 50%;
+  transition: background 0.2s;
+  z-index: 200;
+}
+.banner-cog:hover {
+  background: rgba(0,0,0,0.7);
+}
 
 .categories { display:flex; flex-wrap:wrap; justify-content:center; gap:5px; padding:20px; margin:0 auto; width:80%; }
-.categories button { font-size:4vw; margin:2px; padding:5px 10px; cursor:pointer; background:#555; color:#fff; border:none; border-radius:5px; }
+.categories button { font-size: clamp(20px, 6vw, 40px); margin:2px; padding:5px 10px; cursor:pointer; background:#555; color:#fff; border:none; border-radius:5px; }
 .categories button:hover { background:#777; }
+.categories button.active {
+  background: #ffc400;   /* gold highlight */
+  color: #333;           /* darker text */
+  font-weight: bold;
+}
 
 .nav { display:flex; justify-content:center; padding:10px 0; background:#333; }
 .nav a { color:#fff; margin:0 10px; text-decoration:none; font-weight:bold; }
 .nav a:hover { color:#ffd700; }
 
-.content { flex:1; padding:115px 10px 30px; max-width:1200px; margin:0 auto; }
+.content { flex:1; padding:50px 10px 30px; max-width:1200px; margin:0 auto; }
 
 /* Gallery grid: 2-column masonry-like */
 .gallery { column-count: 2; column-gap: 15px; width: 100%; }
@@ -67,7 +88,6 @@ body { font-family: Arial, sans-serif; background:#f5f5f5; color:#333; min-heigh
   justify-content: center;
   align-items: center;
 }
-
 
 .gallery-item.upload input[type="file"] {
   opacity: 0;

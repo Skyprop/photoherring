@@ -10,6 +10,7 @@ app.secret_key = "supersecretkey"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # folder where app.py lives
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 GALLERY_JSON = os.path.join(BASE_DIR, "gallery.json")
+CONFIG_JSON = os.path.join(BASE_DIR, "config.json")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -106,6 +107,27 @@ def delete(filename):
 
     return redirect(url_for("index"))
 
+@app.route("/set-banner", methods=["POST"])
+def set_banner():
+    if not session.get("logged_in"):
+        return redirect(url_for("index"))
+
+    file = request.files.get("banner")
+    if file and allowed_file(file.filename):
+        # Always use jpg (overwrite old banner)
+        filename = "banner.jpg"
+        filepath = os.path.join(BASE_DIR, "static", filename)
+
+        # Delete old banner if exists
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
+        # Save new banner
+        file.save(filepath)
+
+    return redirect(url_for("index"))
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -118,6 +140,15 @@ def login():
 def logout():
     session.pop("logged_in", None)
     return redirect(url_for("index"))
+
+def load_config():
+    with open(CONFIG_JSON) as f:
+        return json.load(f)
+
+def save_config(config):
+    with open("config.json", "w") as f:
+        json.dump(config, f, indent=2)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
