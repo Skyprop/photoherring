@@ -24,12 +24,12 @@
 
 <!-- Content / Gallery -->
 <main class="content">
-    <div class="categories">
-        <button onclick="filterCategory('All')">All</button>
-        {% for cat in categories %}
-        <button onclick="filterCategory('{{ cat }}')">{{ cat }}</button>
-        {% endfor %}
-    </div>
+  <div class="categories">
+    <button onclick="filterCategory('All')">All</button>
+    {% for cat in categories %}
+      <button onclick="filterCategory('{{ cat }}')">{{ cat }}</button>
+    {% endfor %}
+  </div>
 
   <div class="gallery">
     {% for img in images %}
@@ -39,38 +39,53 @@
            data-title="{{ img.title }}"
            data-category="{{ img.category }}"
            data-date="{{ img.date }}">
-            <img src="{{ url_for('static', filename='uploads/' + img.filename) }}" alt="{{ img.title }}">
+        <img src="{{ url_for('static', filename='uploads/' + img.filename) }}" alt="{{ img.title }}">
         {% if logged_in %}
-          <a href="{{ url_for('delete', filename=img.filename) }}" class="delete-btn">×</a>
+          <a href="{{ url_for('delete', filename=img.filename) }}" class="delete-btn" onclick="event.stopPropagation(); return confirm('Delete this image?')">×</a>
         {% endif %}
       </div>
     {% endfor %}
 
     {% if logged_in %}
-    <div class="gallery-item upload">
-      <form class = "upload-button" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" onchange="this.form.submit()">
-        <span class="plus">+</span>
-      </form>
-    </div>
-
-    <div id="editModal" class="modal">
-        <form id="editForm" method="post">
-            <label>Title:</label>
-            <input type="text" name="title" id="modalTitle">
-            <label>Category:</label>
-            <input type="text" name="category" id="modalCategory">
-            <label>Date:</label>
-            <input type="datetime-local" name="date" id="modalDate">
-            <button type="submit">Save</button>
-            <button type="button" onclick="closeModal()">Cancel</button>
-        </form>
-    </div>
+      <div class="gallery-item-wrapper">
+        <div class="gallery-item upload">
+          <form class="upload-button" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" onchange="this.form.submit()">
+            <span class="plus">+</span>
+          </form>
+        </div>
+      </div>
     {% endif %}
   </div>
 </main>
 
-<!-- Edit Modal -->
+<!-- Edit / Lightbox Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <img id="modalImage" src="" alt="">
+
+    <form id="editForm" method="post" class="modal-details-form">
+      <div class="modal-details">
+        <div class="detail">
+          <label>Title:</label>
+          <input type="text" id="modalTitle" name="title" readonly>
+        </div>
+        <div class="detail">
+          <label>Category:</label>
+          <input type="text" id="modalCategory" name="category" readonly>
+        </div>
+        <div class="detail">
+          <label>Date:</label>
+          <input type="datetime-local" id="modalDate" name="date" readonly>
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" onclick="closeModal()">Close</button>
+        <button type="submit" id="saveButton" style="display:none;">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 
 <!-- Footer -->
@@ -79,31 +94,69 @@
 </footer>
 
 <script>
+// Open modal
 function openModal(img) {
-  document.getElementById('modalTitle').value = img.dataset.title;
-  document.getElementById('modalCategory').value = img.dataset.category;
-  document.getElementById('modalDate').value = img.dataset.date.slice(0,16);
-  document.getElementById('editForm').action = "/edit/" + img.dataset.filename;
-  document.getElementById('editModal').style.display = "flex";
+  const modal = document.getElementById('editModal');
+  const modalImg = document.getElementById('modalImage');
+  const titleInput = document.getElementById('modalTitle');
+  const categoryInput = document.getElementById('modalCategory');
+  const dateInput = document.getElementById('modalDate');
+  const saveButton = document.getElementById('saveButton');
+  const form = document.getElementById('editForm');
+
+  modalImg.src = img.querySelector('img').src;
+  modalImg.alt = img.dataset.title;
+
+  titleInput.value = img.dataset.title;
+  categoryInput.value = img.dataset.category;
+  dateInput.value = img.dataset.date.slice(0,16);
+
+  if ({{ 'true' if logged_in else 'false' }}) {
+    titleInput.removeAttribute('readonly');
+    categoryInput.removeAttribute('readonly');
+    dateInput.removeAttribute('readonly');
+    saveButton.style.display = 'block';
+    form.action = "/edit/" + img.dataset.filename;
+  } else {
+    titleInput.setAttribute('readonly', true);
+    categoryInput.setAttribute('readonly', true);
+    dateInput.setAttribute('readonly', true);
+    saveButton.style.display = 'none';
+  }
+
+  modal.style.display = 'flex';
 }
 
+// Close modal
 function closeModal() {
-  document.getElementById('editModal').style.display = "none";
+  document.getElementById('editModal').style.display = 'none';
 }
+
+// Close when clicking outside content
+document.getElementById('editModal').addEventListener('click', function(e){
+  if(e.target === this) closeModal();
+});
 
 function filterCategory(cat) {
   let items = document.querySelectorAll('.gallery-item');
   items.forEach(item => {
+    // Always keep the upload button visible
     if(item.classList.contains('upload')) {
-      item.style.display = 'flex'; // always show upload
-    } else if(cat === 'All' || item.dataset.category === cat){
+      item.style.display = 'flex';
+    } 
+    // Show item if category matches or "All" is selected
+    else if(cat === 'All' || item.dataset.category === cat) {
       item.style.display = 'block';
-    } else {
+    } 
+    // Otherwise hide it
+    else {
       item.style.display = 'none';
     }
   });
 }
-</script>
 
+
+
+</script>
 </body>
 </html>

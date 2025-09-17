@@ -65,16 +65,29 @@ def index():
 
 @app.route("/edit/<filename>", methods=["POST"])
 def edit(filename):
+    # Ensure user is logged in
     if not session.get("logged_in"):
         return redirect(url_for("index"))
 
     images = load_gallery()
-    for img in images:
-        if img["filename"] == filename:
-            img["title"] = request.form.get("title", img["title"])
-            img["category"] = request.form.get("category", img["category"])
-            img["date"] = request.form.get("date", img["date"])
-            break
+
+    # Find the image
+    img = next((i for i in images if i["filename"] == filename), None)
+    if not img:
+        return "Image not found", 404
+
+    # Check if this user is allowed to edit
+    # Example: only allow if current user owns the image
+    # Replace this with your own authorization logic
+    current_user = session.get("username")  # or however you store user identity
+    if img.get("owner") != current_user:
+        return "Forbidden", 403
+
+    # Update image details safely
+    img["title"] = request.form.get("title", img["title"])
+    img["category"] = request.form.get("category", img["category"])
+    img["date"] = request.form.get("date", img["date"])
+
     save_gallery(images)
     return redirect(url_for("index"))
 
