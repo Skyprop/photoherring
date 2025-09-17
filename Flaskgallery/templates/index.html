@@ -19,6 +19,20 @@
   </nav>
 </header>
 
+
+
+
+<!-- Content / Gallery -->
+<main class="content">
+  <h1 class="top-logo">Bob de Bouwer Fotography</h1>
+
+  <div class="about-me">
+    <p>My name is lorem loop poo poo poo
+      Iam photomen, sho sho i teak pfoto of u :)
+    </p>
+    <a href="">klik ere</a>
+    <h2>epicness</h2>
+</div>
 <div class="banner" 
      style="background-image: url('{{ url_for('static', filename='banner.jpg') }}');">
 
@@ -39,11 +53,6 @@
     {% endfor %}
   </div>
 </div>
-
-
-
-<!-- Content / Gallery -->
-<main class="content">
   <div class="gallery">
     {% for img in images %}
       <div class="gallery-item" 
