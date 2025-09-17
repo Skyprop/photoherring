@@ -39,7 +39,7 @@
            data-title="{{ img.title }}"
            data-category="{{ img.category }}"
            data-date="{{ img.date }}">
-        <img src="{{ url_for('static', filename='uploads/' ~ img.filename) }}" alt="{{ img.title }}">
+            <img src="{{ url_for('static', filename='uploads/' + img.filename) }}" alt="{{ img.title }}">
         {% if logged_in %}
           <a href="{{ url_for('delete', filename=img.filename) }}" class="delete-btn">×</a>
         {% endif %}
@@ -48,7 +48,7 @@
 
     {% if logged_in %}
     <div class="gallery-item upload">
-      <form method="post" enctype="multipart/form-data">
+      <form class = "upload-button" method="post" enctype="multipart/form-data">
         <input type="file" name="file" onchange="this.form.submit()">
         <span class="plus">+</span>
       </form>

@@ -6,8 +6,10 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
-UPLOAD_FOLDER = "static/uploads"
-GALLERY_JSON = "gallery.json"
+# ------------------ FIXED PATHS ------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # folder where app.py lives
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
+GALLERY_JSON = os.path.join(BASE_DIR, "gallery.json")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -16,6 +18,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 if not os.path.exists(GALLERY_JSON):
     with open(GALLERY_JSON, "w") as f:
         json.dump([], f)
+# -------------------------------------------------
 
 # Admin credentials
 USERNAME = "admin"
